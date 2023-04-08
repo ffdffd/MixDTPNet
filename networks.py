@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 import torch.nn.functional as F
-import numpy as np
+import numpy as np 
 
 class CTPnet(nn.Module):
     def __init__(self, recurrent_iter=3, use_GPU=True, factor=10e-3, color=True, burst_length=1, blind_est=True, kernel_size=[5], sep_conv=False,
