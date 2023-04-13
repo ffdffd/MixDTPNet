@@ -2,8 +2,8 @@ import torch
 import os
 import argparse
 import numpy as np
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"#python -m torch.distributed.launch --nproc_per_node=2 /data/ProjectData/Derain/Rain200L/TrainedModel/mixDTPNet/codecopy/main.py
-parser = argparse.ArgumentParser(description="PReNet_train")
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+parser = argparse.ArgumentParser(description="CPTNet_train")
 parser.add_argument("--preprocess", type=bool, default=True, help='run prepare_data or not')
 parser.add_argument("--batch_size", type=int, default=3, help="Training batch size")  
 parser.add_argument("--epochs", type=int, default=300, help="Number of training epochs") 
@@ -27,13 +27,13 @@ from torch.optim.lr_scheduler import MultiStepLR
 from utils import SSIM
 from tqdm import tqdm
 from networks import CTPnet
-# from networks_pretrained import CTPnet
 from dataset import Dataset_Rain200L
+from test import test
+
 
 device = torch.device('cuda')
 
 GPU_NUM = torch.cuda.device_count()
-# GPU_NUM = 0 # 手动禁止DDP
 if  GPU_NUM>1:
     # Logsave_path = sys.argv[1]
     local_rank = int(os.environ['LOCAL_RANK'])
@@ -53,7 +53,6 @@ def main():
     dataset_train = Dataset_Rain200L("/data/ProjectData/Derain/DID-Data/train")
     model = CTPnet(recurrent_iter=opt.recurrent_iter, use_GPU=opt.use_gpu).cuda()
     
-    # loader_train = DataLoader(dataset=dataset_train, num_workers=16, batch_size=opt.batch_size, shuffle=True)
     if  GPU_NUM>1:
         train_sampler = torch.utils.data.distributed.DistributedSampler(dataset_train)
         loader_train = torch.utils.data.DataLoader(dataset_train, batch_size=opt.batch_size, shuffle = (train_sampler is None), sampler=train_sampler, pin_memory=True)
@@ -65,8 +64,6 @@ def main():
     criterion_L2 = SSIM()
 
     if  GPU_NUM>1:
-        # device_ids = [0, 1]
-        # model = torch.nn.DataParallel(model,device_ids = device_ids)
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[rank], output_device=rank,find_unused_parameters=True).cuda()
     # record training
     writer = SummaryWriter(opt.save_path)   
@@ -91,36 +88,30 @@ def main():
         if  GPU_NUM>1:
             train_sampler.set_epoch(epoch)   
         for param_group in optimizer.param_groups:
-            print('learning rate %f' % param_group["lr"]) # learning rate 0.001000
+            print('learning rate %f' % param_group["lr"])
         ## epoch training start
         for i, (input_train, target_train) in enumerate(tqdm(loader_train)):
-            # sum += batch_PSNR(input_train,target_train,1.0)
-            # print(sum/(i+1))
-            # continue
             model.train()  # nn.Module.train的继承
             # model.zero_grad()
             optimizer.zero_grad()
             
             count, psnr_all= 0,0
-            # input_train, target_train = Variable(input_train), Variable(target_train)
-
             if opt.use_gpu:
                 input_train, target_train = input_train.cuda(), target_train.cuda()
-            # with autocast():
             out_train, pred1 = model(input_train)
-            pixel_metric = criterion(target_train, out_train) # target_train.size()---torch.Size([2, 3, 100, 100]); out_train.size()---torch.Size([2, 3, 100, 100])
+            pixel_metric = criterion(target_train, out_train)
             layer2_loss = criterion_L2(target_train,pred1)
             loss = -pixel_metric  
             loss = -pixel_metric + 0.5*layer2_loss  
             loss.backward() 
-            optimizer.step() # BUG 2022.07.22 将 step 放在每个epoch训练完以后
+            optimizer.step()
             
             # training curve
             psnr_all += batch_PSNR(out_train, target_train, 1.)* out_train.shape[0]
             count += out_train.shape[0]
             step += 1
-            # if step % 1 == 0:
-            if 0:
+
+            if step % 1 == 0:
                 # Log the scalar values
                 writer.add_scalar('loss', loss.item(), step)
                 writer.add_scalar('PSNR on training data', psnr_all/count, step)
@@ -131,26 +122,27 @@ def main():
                 # print results
                 print("[epoch %d][%d/%d] loss: %.4f, loss2: %.4f, pixel_metric: %.4f, PSNR: %.4f" %
                 (epoch+1, i+1, len(loader_train), loss.item(), layer2_loss.item(), pixel_metric.item(), psnr_all/count))
-            
-
-        if  GPU_NUM>1:
-            # if epoch % opt.save_freq == 0 and rank == 0:
-            if epoch % opt.save_freq == 0 :
-                torch.save(model.module.state_dict(), os.path.join(opt.save_path, 'net_epoch%d.pth' % (epoch+1)))
-                torch.save(model.module.state_dict(), os.path.join(opt.save_path, 'net_latest.pth'))
-        else:
-            if epoch % opt.save_freq == 0:
+        
+        scheduler.step(epoch)   
+        
+        if epoch % opt.save_freq == 0:
+            if  GPU_NUM>1:
+                if rank == 0:
+                    torch.save(model.module.state_dict(), os.path.join(opt.save_path, 'net_epoch%d.pth' % (epoch+1)))
+                    torch.save(model.module.state_dict(), os.path.join(opt.save_path, 'net_latest.pth'))
+            else:
                 torch.save(model.state_dict(), os.path.join(opt.save_path, 'net_epoch%d.pth' % (epoch+1)))
                 torch.save(model.state_dict(), os.path.join(opt.save_path, 'net_latest.pth'))
-
-        scheduler.step(epoch)   
-                    
-        if 1:            
-            from test_PReNet import test
+         
             optimizer.zero_grad() 
             psnr_test_average,pixel_metric_average = test(model)
-            # # 可视化
-            if 0:
+            Note=open(opt.save_path+'/test_log.txt','a')
+            Note.write("=========TEST=======[epoch %d] test_loss: %.4f, pixel_metric: %.4f, test_PSNR: %.4f" %
+            (epoch+1, loss.item(), pixel_metric_average, psnr_test_average))
+            Note.write('\n')
+            print("=========TEST=======[epoch %d] test_loss: %.4f, pixel_metric: %.4f, test_PSNR: %.4f" %
+            (epoch+1, loss.item(), pixel_metric_average, psnr_test_average))
+            if opt.visualization:
                 out_train, _ = model(input_train)
                 out_train = torch.clamp(out_train, 0., 1.)
                 im_target = utils.make_grid(target_train.data, nrow=8, normalize=False, scale_each=True)
@@ -159,14 +151,6 @@ def main():
                 writer.add_image('clean image', im_target, epoch+1)
                 writer.add_image('rainy image', im_input, epoch+1)
                 writer.add_image('deraining image', im_derain, epoch+1)
-            Note=open(opt.save_path+'/test_log.txt','a')
-            Note.write("=========TEST=======[epoch %d] test_loss: %.4f, pixel_metric: %.4f, test_PSNR: %.4f" %
-            (epoch+1, loss.item(), pixel_metric_average, psnr_test_average))
-            Note.write('\n')
-
-            print("=========TEST=======[epoch %d] test_loss: %.4f, pixel_metric: %.4f, test_PSNR: %.4f" %
-            (epoch+1, loss.item(), pixel_metric_average, psnr_test_average))
-
 
 if __name__ == "__main__":
     main()

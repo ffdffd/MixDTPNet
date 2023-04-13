@@ -11,8 +11,6 @@ from math import exp
 
 
 def psnr(pred, target):
-    #print(pred.shape)
-    #print(target.shape)
     mse = torch.mean( (pred - target) ** 2 )
     if mse == 0:
         return 100
@@ -26,9 +24,6 @@ def eval(model, epoch, eval_loader, criterion):
     num_of_val_image = 0
 
     for j, (true_input, true_target) in enumerate(eval_loader):
-        
-        # To device
-        # A is for input image, B is for target image
         true_input = true_input.cuda()
         true_target = true_target.cuda()
 
@@ -70,7 +65,6 @@ def batch_PSNR(img, imclean, data_range):
 
 
 def normalize(data):
-    # return data
     return data / 255.
 
 
@@ -138,9 +132,9 @@ def _ssim(img1, img2, window, window_size, channel, size_average = True):
 
 class SSIM(torch.nn.Module):
     def __init__(self, window_size = 11, size_average = True):
-        super(SSIM, self).__init__()
-        self.window_size = window_size # window_size = 11
-        self.size_average = size_average # size_average = True
+        super(SSIM, self).__init__
+        self.window_size = window_size 
+        self.size_average = size_average 
         self.channel = 1
         self.window = create_window(window_size, self.channel)
 
