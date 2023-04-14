@@ -10,29 +10,13 @@ Jiehui Huang, Haofan Huang, Zhenchao Tang, Lishan Lin, Defeng Zhou, Weicheng Lv,
 
 # Network Architecture
 
-<img src = "https://github.com/ffdffd/MixDTPNet/blob/GITHUB/Network.jpg?raw=true">
+<img src = "https://github.com/ffdffd/MixDTPNet/blob/GITHUB/picture/Network.jpg?raw=true">
 
 ## Installation requirement
 
-torch
-
-torchvision
-
-tensorboardX
-
-tqdm
-
-pickle
-
-numpy
-
-skimage
-
-re
-
-lmdb
-
-cv2
+```
+pip install -r requirements.txt
+```
 
 
 
@@ -40,28 +24,31 @@ cv2
 
 ## Visualization result on 200L
 
-<img src = "https://github.com/ffdffd/MixDTPNet/blob/GITHUB/Result.jpg?raw=true">
+<img src = "https://github.com/ffdffd/MixDTPNet/blob/GITHUB/picture/Result.jpg?raw=true">
 
 ## Visualization result on Rain200H, Rai200L Dataset
 
-<img src = "https://github.com/ffdffd/MixDTPNet/blob/GITHUB/result2.jpg?raw=true">
+<img src = "https://github.com/ffdffd/MixDTPNet/blob/GITHUB/picture/result2.jpg?raw=true">
 
 ## Visualization result on RainDrop, SPA, RID Dataset
 
-<img src = "https://github.com/ffdffd/MixDTPNet/blob/GITHUB/results.jpg?raw=true">
+<img src = "https://github.com/ffdffd/MixDTPNet/blob/GITHUB/picture/results.jpg?raw=true">
 
 
 
 ## Result on 100L, 100H
 
-<img src = "https://github.com/ffdffd/MixDTPNet/blob/GITHUB/Result_100.jpg?raw=true">
+<img src = "https://github.com/ffdffd/MixDTPNet/blob/GITHUB/picture/Result_100.jpg?raw=true">
 
 
 
 ## Result on 200L, 200H
 
-<img src = "https://github.com/ffdffd/MixDTPNet/blob/GITHUB/result_200.jpg?raw=true">
+<img src = "https://github.com/ffdffd/MixDTPNet/blob/GITHUB/picture/result_200.jpg?raw=true">
 
 ### Result on SPA
 
-<img src = "https://github.com/ffdffd/MixDTPNet/blob/GITHUB/result_spa.jpg?raw=true">
+<img src = "https://github.com/ffdffd/MixDTPNet/blob/GITHUB/picture/result_SPA.jpg?raw=true">
+
+
+
