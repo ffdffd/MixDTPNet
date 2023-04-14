@@ -3,16 +3,16 @@ import os
 import argparse
 import numpy as np
 import torch
-from networks import CTPnet
+from Net.networks import CTPnet
 import time
 import tqdm
 import torchvision.utils as utils
-import test_dataset as test_dataset
-from utils import SSIM,normalize,batch_PSNR
+import data.test_dataset as test_dataset
+from utils.utils import SSIM,normalize,batch_PSNR
 from torch.utils.data import DataLoader
 import yaml
 from yaml import Loader
-from test_dataset import progress
+from data.test_dataset import progress
 
 # set yaml path and load yaml config
 cfg_path = "/data/ProjectData/Derain/Rain200L/TrainedModel/mixDTPNet/YMAL/DID.yaml"

@@ -1,7 +1,7 @@
 import torch.utils.data as udata
 import cv2
 import os
-from utils import SSIM,normalize,batch_PSNR
+from utils.utils import SSIM,normalize,batch_PSNR
 import numpy as np
 import torch
 from patchify import patchify

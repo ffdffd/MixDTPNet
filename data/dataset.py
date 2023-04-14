@@ -7,7 +7,7 @@ import h5py
 import torch
 import cv2
 import torch.utils.data as udata
-from utils import normalize
+from utils.utils import normalize
 from patchify import patchify
 import lmdb,pickle
 from numpy import random
