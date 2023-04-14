@@ -1,4 +1,4 @@
-# Result on 200L, 200HProgressive Network based on Detail Scaling and Texture Extraction: A More General Framework for Image Derain 
+# Progressive Network based on Detail Scaling and Texture Extraction: A More General Framework for Image Derain 
 
 Jiehui Huang, Haofan Huang, Zhenchao Tang, Lishan Lin, Defeng Zhou, Weicheng Lv, Yucheng Li, Kang Yuan†, Zhong Pei, Calvin Yu-Chian Chen
 
