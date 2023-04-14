@@ -2,7 +2,7 @@ import os
 import os.path
 import numpy as np
 import lmdb
-np.random.seed(0)
+np.random.seed(0) 
 import h5py
 import torch
 import cv2
