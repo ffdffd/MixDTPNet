@@ -6,7 +6,7 @@ import numpy as np
 import torch
 from patchify import patchify
 
-Log_path = "/data/ProjectData/Derain/Rain200L/TrainedModel/mixDTPNet/Logs"
+Log_path = "./Logs"
 
 def progress(y_origin):
     b, g, r = cv2.split(y_origin)

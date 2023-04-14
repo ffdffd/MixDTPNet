@@ -15,16 +15,16 @@ from yaml import Loader
 from data.test_dataset import progress
 
 # set yaml path and load yaml config
-cfg_path = "/data/ProjectData/Derain/Rain200L/TrainedModel/mixDTPNet/YMAL/DID.yaml"
+cfg_path = "./YMAL/DID.yaml"
 cfg = yaml.load(open(cfg_path, "r").read(), Loader=Loader)
 cfg_name = cfg_path.split('/')[-1].replace(".yaml","")
 print("\n"*10+"Now running "+ cfg_name +"\n"*5)
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0,1"
-parser = argparse.ArgumentParser(description="PReNet_Test1")
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+parser = argparse.ArgumentParser(description="Test1")
 parser.add_argument("--use_GPU", type=bool, default=False, help='use GPU or not')
 parser.add_argument("--recurrent_iter", type=int, default=10, help='number of recursive stages')
-parser.add_argument("-Log_path", type=str, default='/data/ProjectData/Derain/Rain200L/TrainedModel/mixDTPNet/Logs/', help='number of recursive stages')
+parser.add_argument("-Log_path", type=str, default='./Logs/', help='number of recursive stages')
 opt = parser.parse_args()
 
 # add yaml config into opt

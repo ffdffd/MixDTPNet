@@ -42,7 +42,7 @@ def progress(y_origin):
 
 
 class Dataset_Rain200L(udata.Dataset):
-    def __init__(self, data_path='/data/ProjectData/Derain/DID-Data'):
+    def __init__(self, data_path='./ProjectData/Derain/DID-Data'):
         super(Dataset_Rain200L, self).__init__()
         self.data_path = data_path
         self.target_names =  data_path+'/GT/'

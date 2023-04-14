@@ -9,7 +9,7 @@ parser.add_argument("--batch_size", type=int, default=3, help="Training batch si
 parser.add_argument("--epochs", type=int, default=300, help="Number of training epochs") 
 parser.add_argument("--milestone", type=int, default=[10,50,80], help="When to decay learning rate")
 parser.add_argument("--lr", type=float, default=1e-4, help="initial learning rate")
-parser.add_argument("--save_path", type=str, default="/data/ProjectData/Derain/Rain200L/TrainedModel/mixDTPNet/Logs/DID", help='path to save models and log files')  
+parser.add_argument("--save_path", type=str, default="./Logs/DID", help='path to save models and log files')  
 parser.add_argument("--save_freq",type=int,default=1,help='save intermediate model')
 parser.add_argument("--Logsave_path",type=str, default="log1.txt",help='path to training data') 
 parser.add_argument("--use_gpu", type=bool, default=True, help='use GPU or not')
@@ -50,7 +50,7 @@ def main():
 
     print('Loading dataset ...\n')
     
-    dataset_train = Dataset_Rain200L("/data/ProjectData/Derain/DID-Data/train")
+    dataset_train = Dataset_Rain200L("./ProjectData/Derain/DID-Data/train")
     model = CTPnet(recurrent_iter=opt.recurrent_iter, use_GPU=opt.use_gpu).cuda()
     
     if  GPU_NUM>1:

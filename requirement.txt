@@ -8,3 +8,6 @@ skimage
 re
 lmdb
 cv2
+einops
+pdb
+numbers
